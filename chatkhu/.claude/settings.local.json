@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 *)",
+      "mcp__google-workspace__read_sheet_values",
+      "mcp__google-workspace__format_sheet_range",
+      "mcp__google-workspace__modify_sheet_values"
+    ]
+  }
+}
