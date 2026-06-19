@@ -1,7 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "Bash(apt list *)"
+      "mcp__notionhq-notion__API-get-self",
+      "mcp__notionhq-notion__API-retrieve-a-page",
+      "mcp__google-workspace__create_drive_folder",
+      "mcp__google-workspace__create_drive_file",
+      "Bash(mkdir -p /home/user/.workspace-mcp/attachments)",
+      "Bash(cp /home/user/workspace/chatkhu/output_images/*.png /home/user/.workspace-mcp/attachments/)",
+      "mcp__google-workspace__set_drive_file_permissions",
+      "Bash(python3 *)",
+      "mcp__notionhq-notion__API-patch-block-children",
+      "mcp__google-workspace__format_sheet_range",
+      "Bash(tee /tmp/download_org.log)",
+      "mcp__google-workspace__read_sheet_values",
+      "mcp__google-workspace__modify_sheet_values",
+      "Bash(pip show *)",
+      "Bash(gcloud auth *)"
     ]
   }
 }
