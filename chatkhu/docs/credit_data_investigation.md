@@ -34,7 +34,7 @@ GET /api/proxy/admin/dashboards/usage/export-task/
 GET /api/proxy/admin/members/export-task/
     ?response_type=csv&start_date=...&end_date=...&credit_source=organization
 ```
-- `credit_source=organization` 파라미터는 **조직 소속 유저를 필터**할 뿐
+- `credit_source=organization` 파라미터는 **이 API에서 완전히 무시됨** (유저 필터도 사용량 필터도 아님 — 검증 완료)
 - `기간 내 크레딧 사용량 총합` 컬럼 = **조직 크레딧 + 개인 구매 크레딧 포함**
 - 유저별·신분별(학생/교수/교직원) 분류 **가능**
 - `개인 구매 크레딧 사용량` 컬럼 = 누적값 (기간 필터 무관하게 항상 전체 누적)
@@ -89,6 +89,7 @@ GET /api/proxy/admin/members/export-task/
 
 - `code/download_daily_org.py` — `members/export-task` 일별 스냅샷 다운로드
 - `code/crosscheck_monthly_credits.py` — 대시보드 API vs daily_data_organization 월별 비교
+- `code/verify_credit_source_param.py` — `credit_source` 파라미터 효과 검증
 
 ---
 
@@ -98,3 +99,37 @@ GET /api/proxy/admin/members/export-task/
 2. **신분별 org 크레딧 월 분리** → 현재 불가. 별도 API 또는 로그 기반 데이터 필요
 3. **daily_data_organization 파일은 org only 집계에 사용 불가** (개인 크레딧 포함)
 4. 시트에 들어간 기존 값의 출처·계산 방식 불명 (코드 유실). 대시보드 API 값으로 교체 권장
+
+---
+
+## 추가 검증: credit_source 파라미터 효과 (2026-06-23)
+
+### 검증 목적
+
+`members/export-task?credit_source=organization` 파라미터가  
+`기간 내 크레딧 사용량 총합` 컬럼에 실제로 영향을 주는지 확인.
+
+### 검증 방법
+
+동일 날짜(2026-05-09)를 파라미터 있음 / 없음으로 각각 API 호출 후 비교.  
+(`code/verify_credit_source_param.py` 실행)
+
+### 결과
+
+| 항목 | credit_source=organization 있음 | 없음 |
+|------|-------------------------------|------|
+| 멤버 수 | 6,308 | 6,308 |
+| 기간 내 크레딧 사용량 총합 합계 | 157,550.424 | 157,550.424 |
+| 신분별 (학생/교수/교직원) | 93,934.567 / 56,263.955 / 7,351.902 | 동일 |
+
+**→ 완전 일치. `credit_source=organization` 파라미터는 members/export-task에서 무효.**
+
+### 컬럼 의미 확정
+
+| 컬럼 | 확정된 의미 |
+|------|-----------|
+| `기간 내 크레딧 사용량 총합` | 쿼리 기간 사용량 (조직+개인 혼합, 분리 불가) = 모든 모델별 크레딧 합산 |
+| `개인 구매 크레딧 사용량` | 평생 누적값 (기간 필터 무관) — 일별 합산 시 N배 오류 |
+| `현재 월 크레딧 할당량/잔여량` | 다운로드 시점의 현재 월 기준 (역사적 값 아님) |
+
+→ 상세 컬럼 정의: `docs/member_data_columns.md` 참조
