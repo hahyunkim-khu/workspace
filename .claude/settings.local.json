@@ -15,7 +15,11 @@
       "mcp__google-workspace__read_sheet_values",
       "mcp__google-workspace__modify_sheet_values",
       "Bash(pip show *)",
-      "Bash(gcloud auth *)"
+      "Bash(gcloud auth *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "mcp__google-workspace__get_spreadsheet_info",
+      "Bash(git add *)"
     ]
   }
 }
